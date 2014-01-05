@@ -1,5 +1,8 @@
 import sys
 import cPickle
+import urllib, json
+import pprint
+import time
 def shortestpath(graph,start,end,visited=[],distances={},predecessors={}):
     """Find the shortest path between start and end nodes in a graph"""
     # we've found our end node, now find the path to it, and return
@@ -34,42 +37,78 @@ distance = cPickle.load(open('distance.p', 'rb'))
 
 names = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','R','S','T','U','V','Z','X','Y','W','Q','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AR','AS','AT','AU','AV','AZ','AX','AY','AW','AQ']
 
-G = {}
 lat = float(sys.argv[1])
 lng = float(sys.argv[2])
+latLngNum = len(coords)
+izvan_dosega = 1
 
-latLngNum = 0
+coords.append([lat,lng])
+dis_temp = []
+adj_temp = []
+for red in distance: red.append(['a','b']);
+for red in adjmat: red.append(0);
+for b in coords:
+    adj_temp.append(0);
+    dis_temp.append(['a','b']);    
+distance.append(dis_temp);
+adjmat.append(adj_temp);
 
+for b in range(0,len(coords)):
+    a = latLngNum
+    error = 0
+    while error>=0:
+        if(error>0):
+            time.sleep(1.0)            
+        if(a==b):
+            distance[a][b] = 0
+        if(a>b):
+            URL2 = "http://maps.googleapis.com/maps/api/directions/json?origin="+str(coords[a][0])+","+str(coords[a][1])+"&destination="+str(coords[b][0])+","+str(coords[b][1])+"&mode=walking&sensor=false"
+            googleResponse = urllib.urlopen(URL2)               
+            jsonResponse = json.loads(googleResponse.read())
+            try:
+                ij_distance = jsonResponse['routes'][0]['legs'][0]['distance']['value']
+            except IndexError:
+                ij_distance = ''
+            if(ij_distance!=''):
+                distance[a][b] = ij_distance
+                distance[b][a] = ij_distance
+                error = -1
+                if( len(jsonResponse['routes'][0]['legs'][0]['steps'])==1 ):
+                    adjmat[a][b] = 1
+                    adjmat[b][a] = 1
+                    izvan_dosega = 0                        
+            else:
+                error = error + 1
+        else:
+            error = -1
+
+G = {}
 for x in range(0,len(coords)):
-        temp = {}
-	if(coords[x][0]==lat and coords[x][1]==lng):		
-		latLngNum = x		
-        for y in range(0,len(coords)):
-                if( int(distance[x][y])==0 ):
-                    continue
-                if( int(adjmat[x][y])!=1 ):
-                    continue
-                temp[names[y]] = int(distance[x][y])                
-        G[names[x]] = temp
+    temp = {}	
+    for y in range(0,len(coords)):
+        if( int(distance[x][y])==0 or int(adjmat[x][y])!=1):
+            continue
+        temp[names[y]] = int(distance[x][y])                
+    G[names[x]] = temp
 
 #print G
 
-#print shortestpath(G,"A",names[latLngNum])[1]
-
 fullCordsPath = ""
 
-for index, nood in enumerate(shortestpath(G,"A",names[latLngNum])[1]):
-	poz = 0	
-	for i in range(0,len(names)):
-		if(str(nood)==names[i]):
-			poz = i
-			break
-	if i == 0:
-		fullCordsPath = fullCordsPath + str(coords[poz][0])+","+str(coords[poz][1])
-	else:
-		fullCordsPath = fullCordsPath+ ";" + str(coords[poz][0])+","+str(coords[poz][1])
+if izvan_dosega==1:
+    fullCordsPath = fullCordsPath + str(coords[0][0])+","+str(coords[0][1])+";"+ str(lat)+","+str(lng)
+else:
+    for index, nood in enumerate(shortestpath(G,"A",names[latLngNum])[1]):
+    	poz = 0	
+    	for i in range(0,len(names)):
+    		if(str(nood)==names[i]):
+    			poz = i
+    			break
+    	if i == 0:
+    		fullCordsPath = fullCordsPath + str(coords[poz][0])+","+str(coords[poz][1])
+    	else:
+    		fullCordsPath = fullCordsPath+ ";" + str(coords[poz][0])+","+str(coords[poz][1])
 
 print fullCordsPath
-
 
 
