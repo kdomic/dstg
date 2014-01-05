@@ -1,0 +1,39 @@
+https://developers.google.com/maps/documentation/directions/
+
+http://maps.googleapis.com/maps/api/directions/json?origin=45.5580,18.7134&destination=45.557970,18.710975&sensor=false
+
+var last = new google.maps.LatLng(45.5580, 18.7134);
+window.onload = function() {
+    var latlng = new google.maps.LatLng(45.5580, 18.7134);
+    var map = new google.maps.Map(document.getElementById('map'), {
+        center: latlng,
+        zoom: 11,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+    });
+    var marker = new google.maps.Marker({
+        position: latlng,
+        map: map,
+        title: 'Zagreb',
+        draggable: true
+    });
+    google.maps.event.addListener(marker, 'dragend', function(a) {       
+        document.getElementById('coords').innerHTML = document.getElementById('coords').innerHTML + "["+a.latLng.lat().toFixed(6)+","+a.latLng.lng().toFixed(6)+"],";
+        var marker = new google.maps.Marker({
+            position: last,
+            map: map
+        });
+        last = new google.maps.LatLng(a.latLng.lat().toFixed(6), a.latLng.lng().toFixed(6));        
+    });
+    
+    var myCars=new Array([45.557970,18.710975],[45.557264,18.710782],[45.557880,18.708422],[45.558646,18.705139],[45.554514,18.704710],[45.554048,18.715546],[45.556122,18.715675],[45.556858,18.712628],[45.555731,18.712091],[45.556122,18.708207],[45.554800,18.708100],[45.554830,18.706555],[45.554755,18.709945],[45.556002,18.710096],[45.554965,18.711404],[45.554969,18.710034],[45.555089,18.715656],[45.557944,18.715806],[45.558815,18.715903],[45.559664,18.715935],[45.560055,18.715173],[45.560385,18.715892],[45.560941,18.717898],[45.560550,18.718992],[45.560317,18.718874],[45.560310,18.718467],[45.559799,18.718231],[45.559859,18.718896],[45.558875,18.719143],[45.558778,18.717920],[45.558755,18.716922],[45.557260,18.716847],[45.557328,18.719400],[45.556276,18.719690],[45.555930,18.718338],[45.556111,18.716836],[45.555930,18.716750],[45.554999,18.720248],[45.555044,18.719733],[45.553515,18.718966],[45.553917,18.717109],[45.554488,18.717356],[45.554736,18.716262],[45.554991,18.716273],[45.555404,18.718762],[45.555254,18.718612],[45.555615,18.717228],[45.555803,18.717260]);
+    var udaljenosti = new Array();
+    for (var i=0;i<myCars.length;i++){
+        //console.log(""+myCars[i][0]+" "+myCars[i][1]);
+        var marker12 = new google.maps.Marker({
+            position: new google.maps.LatLng(myCars[i][0], myCars[i][1]),
+            map: map,
+            title: 'asd',
+            draggable: true
+        });
+    } 
+};

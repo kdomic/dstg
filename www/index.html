@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Test</title>
+	<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>	
+	<style type="text/css"> html, body, #map {  height: 100%;  margin: 0; } </style>
+</head>
+<body>
+
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<div id="map"></div>
+</body>
+</html>
+<script>
+
+var last = new google.maps.LatLng(45.5580, 18.7134);
+var map;
+window.onload = function() {
+    var latlng = new google.maps.LatLng(45.5580, 18.7134);
+    map = new google.maps.Map(document.getElementById('map'), {
+        center: latlng,
+        zoom: 16,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+    });
+    placeAllMarkers();    
+};
+
+function placeAllMarkers(){
+    var names = new Array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','R','S','T','U','V','Z','X','Y','W','Q','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AR','AS','AT','AU','AV','AZ','AX','AY','AW','AQ');
+    var myCars=new Array([45.557986854,18.713400671],[45.557994366,18.710986682],[45.558283584,18.710772106],[45.557962439,18.708891877],[45.557862902,18.708492228],[45.557782146,18.708792635],[45.557273191,18.710745284],[45.556980211,18.712043473],[45.556108774,18.715680548],[45.557231873,18.715720781],[45.557983098,18.715793201],[45.558786896,18.715862938],[45.559624488,18.715954134],[45.560105252,18.715321132],[45.559819799,18.715133378],[45.560383192,18.715927311],[45.560916532,18.717901417],[45.560555965,18.719006487],[45.560345632,18.718883106],[45.560330609,18.718453952],[45.559808531,18.718207189],[45.559870504,18.718893835],[45.558863895,18.719151327],[45.558800043,18.717922875],[45.558766238,18.716941186],[45.557748341,18.717912146],[45.557973707,18.718593427],[45.557256288,18.716871449],[45.557320143,18.719381997],[45.556313488,18.719682404],[45.555002556,18.720256397],[45.555922841,18.716731974],[45.556099384,18.716839263],[45.557962439,18.717981213],[45.558120195,18.707424038]);
+    for (var i=0;i<myCars.length;i++){
+        //console.log(""+myCars[i][0]+" "+myCars[i][1]);
+        var marker12 = new google.maps.Marker({
+            position: new google.maps.LatLng(myCars[i][0], myCars[i][1]),
+            map: map,
+            title: ""+names[i] +": "+myCars[i][0]+" "+myCars[i][1]
+        });
+        google.maps.event.addListener(marker12, "mousedown", function(e){
+			findPath(e.latLng.nb.toFixed(9), e.latLng.ob.toFixed(9));
+		});
+    } 
+}
+
+function findPath(a,b) {
+  jQuery.ajax({
+    url: "findPath.php?lat="+a+"&lng="+b,
+    cache: false,
+    dataType: "json",
+    success: function(json) {
+	prev_lat = 45.557986854;
+	prev_lng = 18.713400671;
+	$.each(json, function(index, value) {
+	    	console.log(value[0]);
+		console.log(value[1]);
+		drawLine(prev_lat,prev_lng,value[0],value[1]);
+		prev_lat = value[0];
+		prev_lng = value[1];
+	});
+    }
+  });
+}
+
+function drawLine(lat1,lng1,lat2,lng2){
+	var lineCoords = new Array();
+	lineCoords.push(new google.maps.LatLng(parseFloat(lat1), parseFloat(lng1)));
+	lineCoords.push(new google.maps.LatLng(parseFloat(lat2), parseFloat(lng2)));
+	makeLine = new google.maps.Polygon({
+		paths: lineCoords,
+		strokeColor: '#00FF00',
+		strokeOpacity: 1,
+		strokeWeight: 5,
+		fillColor: '#00FF00',
+		fillOpacity: 0
+	});
+	makeLine.setMap(map);
+}
+
+</script>

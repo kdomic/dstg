@@ -1,0 +1,60 @@
+//HTML
+<script src="http://maps.google.com/maps?file=api&v=2&key=ABQIAAAA7j_Q-rshuWkc8HyFI4V2HxQYPm-xtd00hTQOC0OXpAMO40FHAxT29dNBGfxqMPq5zwdeiDSHEPL89A" type="text/javascript"></script>
+<body onload="initialize()">
+    <form action="#" onsubmit="showLocation(); return false;">
+        <p>
+            <input type="text" name="address1" value="Address 1" />
+            <input type="text" name="address2" value="Address 2" />
+            <input type="submit" value="Search" />
+        </p>
+    </form>
+	<div id="map-canvas"></div>
+	<button onclick="test()">Click</button>
+    <p id="coords"></p>
+    <p id="results"></p>
+
+
+//CSS
+#map-canvas {  height: 300px;  margin: 0; }
+
+
+//JS
+var bolnicaLatLng =  new GLatLng(45.5580, 18.7134);
+var latlng = new GLatLng(45.5561, 18.7157);
+var location1, location2, gDir;
+
+window.onload = function() {
+    var map = new GMap2(document.getElementById('map-canvas'));    
+    map.setCenter(bolnicaLatLng, 15);
+    map.setUIToDefault();
+    map.addOverlay(new GMarker(bolnicaLatLng));
+    
+    gDir = new GDirections();  
+    
+    //http://maps.googleapis.com/maps/api/directions/json?origin=45.55797,18.710975&destination=45.554969,18.710034&sensor=false
+    location1 = {lat: "45.5580", lon: "18.7134"};				
+    location2 = {lat: "45.5580", lon: "18.7134"};
+    
+    location1 = {lat: "45.55797", lon: "18.710975"};				
+    location2 = {lat: "45.554969", lon: "18.710034"};
+    
+    var marker = new GMarker(latlng, {draggable: true});    
+    map.addOverlay(marker);
+    
+    //Events
+    GEvent.addListener(marker, "dragend", function(a) {
+        document.getElementById('results').innerHTML = " "+ a.nb.toFixed(4) + ', ' + a.ob.toFixed(4); 
+        location2 = {lat: a.nb.toFixed(4), lon: a.ob.toFixed(4)};
+        marker.openInfoWindowHtml("Mjesto nesreæe");
+    });    
+    GEvent.addListener(gDir, "load", function() {
+        var drivingDistanceMeters = gDir.getDistance().meters;
+        document.getElementById('results').innerHTML = '(' + drivingDistanceMeters + ' meters)';
+    });
+}
+
+function test(){
+    document.getElementById('results').innerHTML = "ok";
+    document.getElementById('coords').innerHTML = ""+location1.lat+", "+location1.lon+" to "+location2.lat+","+location2.lon+"";
+    gDir.load(""+location1.lat+", "+location1.lon+" to "+location2.lat+","+location2.lon+"");
+}

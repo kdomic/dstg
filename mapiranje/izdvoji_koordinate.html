@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mapiranje markera</title>
+	<style type="text/css">
+		html, body, #map { 
+		    height: 600px; 
+		    margin: 0; 
+		}
+	</style>
+</head>
+<body>
+	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+	<div id="map"></div>
+    <p id="coords"></p>
+</body>
+<script type="text/javascript">
+	
+	var last = new google.maps.LatLng(45.5580, 18.7134);
+	window.onload = function() {
+	    var Center = new google.maps.LatLng(45.5580, 18.7134);
+	    var map = new google.maps.Map(document.getElementById('map'), {
+	        center: Center,
+	        zoom: 15,
+	        mapTypeId: google.maps.MapTypeId.ROADMAP
+	    });
+	    var marker = new google.maps.Marker({
+	        position: Center,
+	        map: map,
+	        title: 'Center',
+	        draggable: true
+	    });
+
+	    google.maps.event.addListener(marker, 'dragend', function(a) {       
+	        document.getElementById('coords').innerHTML = document.getElementById('coords').innerHTML + "["+a.latLng.lat().toFixed(9)+","+a.latLng.lng().toFixed(9)+"],";
+	        var marker = new google.maps.Marker({
+	            position: last,
+	            map: map
+	        });
+	        last = new google.maps.LatLng(a.latLng.lat().toFixed(9), a.latLng.lng().toFixed(9));        
+	    });
+
+	};
+
+</script>
+</html>
