@@ -62,7 +62,8 @@ window.onload = function() {
 	        title: 'Novi marker'
 	    }); 
 	    infowindow.open(map,marker);
-	    findPath(event.latLng.nb.toFixed(9), event.latLng.ob.toFixed(9));
+	    console.log(event);
+	    //findPath(event.latLng.nb.toFixed(9), event.latLng.ob.toFixed(9));
 	    $('.info').hide();
 	    $('.warning').show();
 	    $('.success').hide();
